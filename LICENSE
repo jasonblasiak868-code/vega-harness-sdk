@@ -1,0 +1,198 @@
+VEGA SDK Personal, Small Business and Commercial License 1.0
+
+Copyright (c) 2026 Jason Blasiak. All rights reserved.
+
+Patent Pending - U.S. Provisional Applications 63/961,350, 63/962,415,
+64/168,948, and others filed or to be filed by the Licensor.
+
+DRAFT FOR ATTORNEY REVIEW: this text expresses the Licensor's intent and has
+not been reviewed by a lawyer. It is not legal advice.
+
+1. Definitions
+
+"Software" means the software in the repository or package that contains this
+License file, including its source code, object code, documentation, runtime
+card templates, and examples, in every version, together with any portion of
+it. Third-party code included in it stays under its own license.
+
+"Licensor" means Jason Blasiak.
+
+"You" means the person or entity that obtains the Software and accepts this
+License. For Section 2, "You" means a single natural person. For Section 2A,
+"You" means a Small Business.
+
+"Immediate Family Member" means Your spouse or domestic partner, parent,
+child, or sibling.
+
+"Personal Use" means use of the Software by You, and by no more than three (3)
+of Your Immediate Family Members, solely:
+  (a) on computers and devices that You or that Immediate Family Member
+      personally own and that are not owned, leased, managed, or provided by
+      any Organization; and
+  (b) for private, personal, non-commercial purposes that are unrelated to
+      any job, employment, trade, profession, business, or Organization.
+
+"Organization" means any corporation, company, partnership, sole
+proprietorship, limited liability company, business, nonprofit, association,
+school, university, hospital, laboratory, government body or agency, or any
+other institution or legal entity of any kind, together with its owners,
+officers, directors, employees, contractors, and agents when acting for it.
+
+"Affiliate" means any entity that controls, is controlled by, or is under
+common control with another entity.
+
+"Small Business" means a for-profit Organization that, together with all of
+its Affiliates:
+  (a) had total gross revenue of less than US$1,000,000 (or the equivalent in
+      another currency) in its most recently completed financial year (or,
+      if it has not completed one, expects less than that in its first
+      financial year); and
+  (b) is not valued at US$1,000,000 or more, measured by the post-money
+      valuation of its most recent priced equity financing or, if it has had
+      none in the last 24 months, by a good-faith valuation made in the last
+      24 months; and
+  (c) is not a government body, and is not controlled by or an Affiliate of
+      an Organization that is not itself a Small Business.
+
+"Registration" means a written notice to the Licensor, sent to the
+registration address in Section 10, stating: the Organization's legal name and
+country; a contact person and address; confirmation that it meets the
+definition of Small Business and the revenue band for its last financial year
+(under US$1,000,000); which Software it uses; the products or services it
+uses the Software in; and the date it first used the Software.
+
+"Commercial License" means a separate written license agreement signed by the
+Licensor, which may require license fees and royalties.
+
+2. Personal Use (free)
+
+Subject to Your compliance with this License, the Licensor grants You a
+personal, non-exclusive, non-transferable, non-sublicensable, revocable,
+royalty-free license, for Personal Use only, to:
+  (a) download, view, and read the Software;
+  (b) install and run the Software on Your personal devices to try it out and
+      to create and operate Your own personal runtime environments; and
+  (c) create Your own configurations using the Software's documented
+      interfaces, without altering the Software itself.
+Personal Use is limited to You and no more than three (3) Immediate Family
+Members in total.
+
+2A. Small Business Grant (free, with Registration)
+
+For as long as You are a Small Business, have Registered, and comply with this
+Section 2A, the Licensor grants You a non-exclusive, non-transferable,
+non-sublicensable, royalty-free license to:
+  (a) use the Software inside Your Organization, on Your own or Your
+      Organization's devices and infrastructure;
+  (b) modify the Software for Your own use and for use in Your products and
+      services;
+  (c) incorporate the Software, unmodified or modified, as a component of a
+      larger product or service of Yours that adds substantial functionality
+      of its own, and provide that product or service to Your customers,
+      whether installed or hosted; Your customers receive no right to the
+      Software apart from using it as part of Your product or service.
+
+Conditions of Section 2A:
+  (i)   Registration. You must Register within thirty (30) days after You
+        first use the Software, and renew Your Registration within thirty
+        (30) days after the end of each of Your financial years by confirming
+        in writing that You still meet the definition of Small Business and
+        stating Your revenue band.
+  (ii)  Records and verification. You must keep records that show You meet the
+        definition of Small Business. Once in any twelve months the Licensor
+        may ask You in writing for a short written statement of those facts,
+        and You must answer within thirty (30) days. There is no on-site
+        audit.
+  (iii) The registry. The Licensor keeps a register of Registrations for
+        transparency and auditing. The Licensor may disclose it to auditors,
+        regulators, and where the law requires, and may publish totals and
+        statistics. The Licensor will not publish Your name without Your
+        consent.
+  (iv)  Outgrowing the limit. If You stop being a Small Business, Your rights
+        under this Section 2A continue for ninety (90) days after the end of
+        the financial year in which You stopped, during which You must either
+        obtain a Commercial License or stop using the Software and destroy
+        all copies. Crossing the limit part-way through a financial year does
+        not by itself end Your rights until that year ends.
+  (v)   Notices. You must keep every copyright, patent, and license notice in
+        the Software and include a copy of this License with any copy of the
+        Software You provide as part of Section 2A(c).
+  (vi)  No stand-alone redistribution. You may not make the Software, or a
+        modification of it, available to others as an SDK, library, or
+        service in its own right, or in a product whose main value is the
+        Software itself.
+
+3. What Requires a Commercial License
+
+Unless Section 2 or Section 2A applies, You may NOT do any of the following
+without a Commercial License:
+  (a) use the Software in or for any Organization, at any level and in any
+      role, including use by an owner, officer, director, employee,
+      contractor, or agent for any work or business purpose, or on any
+      device, network, or account owned, leased, managed, or provided by an
+      Organization;
+  (b) alter, modify, adapt, translate, or create derivative works of the
+      Software;
+  (c) distribute, publish, share, sublicense, rent, lease, lend, host, or
+      otherwise make the Software, or any portion or modification of it,
+      available to any person other than as Section 2 or Section 2A
+      expressly allows, in source or compiled form, whether or not for a fee;
+  (d) sell the Software, or any product, service, device, or work that
+      incorporates, embeds, is built on, or is derived from the Software or
+      any portion of it;
+  (e) use the Software to generate revenue or other commercial advantage,
+      directly or indirectly, including by offering it as a hosted or managed
+      service or by using it to provide services to others; or
+  (f) remove, alter, or obscure any copyright, patent, or license notice in
+      the Software.
+Each of these needs its own Commercial License and is subject to the fees and
+royalties stated in it.
+
+4. Patents
+
+The Licensor grants You a non-exclusive, non-transferable, revocable license
+under the Licensor's patents and patent applications identified above, solely
+to the extent necessary to exercise the rights granted to You in Section 2 or
+Section 2A, and only while those rights are in force. No other license or
+right is granted, by implication, estoppel, or otherwise, under any patent or
+patent application owned or controlled by the Licensor. Any other right to
+practice the inventions in those patents and applications must be obtained in a
+Commercial License. If You bring a patent claim against the Licensor or any
+user of the Software alleging that the Software infringes a patent, Your
+licenses under this Section end.
+
+5. Contributions and Feedback
+
+Any modification, suggestion, or feedback You provide to the Licensor may be
+used by the Licensor for any purpose without obligation to You.
+
+6. Termination
+
+This License terminates automatically and immediately if You breach it, except
+that a failure to Register or to renew under Section 2A may be cured within
+thirty (30) days after the Licensor notifies You. On termination You must stop
+all use of the Software and destroy all copies in Your possession or control.
+
+7. No Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING WITHOUT LIMITATION WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
+
+8. Limitation of Liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT WILL THE LICENSOR BE
+LIABLE FOR ANY DAMAGES OF ANY KIND ARISING OUT OF OR RELATED TO THIS LICENSE
+OR THE SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+9. Reservation of Rights
+
+All rights not expressly granted in this License are reserved by the Licensor.
+This License does not grant any right to use the Licensor's names, trademarks,
+or logos. This is a source-available license, not an open source license.
+
+10. Registration and Commercial Licensing
+
+Registrations and requests for a Commercial License: jasonblasiak.ai.mail@gmail.com
+Subject line for a Registration: "Small Business Registration: <your organization>"
+Subject line for a Commercial License: "VEGA SDK Commercial License"
