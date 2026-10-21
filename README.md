@@ -2,6 +2,14 @@
 
 ![vega-harness-sdk](assets/tile.svg)
 
+<!-- vega-install-order -->
+> **Build order: 4/4. This kit needs 3 other Vega kits installed first.** Install them in this order, then this one:
+> 1/4 `vega-custody-sdk`  
+> 2/4 `vega-governance-jacket-sdk`  
+> 3/4 `vega-librarian-sdk`  
+> 4/4 `vega-harness-sdk` (this kit)
+> Install each with `pip install --no-deps git+https://github.com/jasonblasiak868-code/<name>` in the order shown, plus `pip install cryptography`. Full steps: [INTEGRATION_GUIDE](https://github.com/jasonblasiak868-code/vega-umbrella-sdk/blob/main/INTEGRATION_GUIDE.md).
+
 This kit owns one concern: **deterministic workflow conduct, pre-registered paths and the library use gate.** It runs a workflow step by step with no model inside the loop, freezes the expected path before anything touches the world, and gates every use of third-party code. The failure it prevents is the quiet one: an agent workflow that "mostly works" but skips a lesson check, reuses an old approval, re-explains a surprise as expected, or splices restricted code into a public build — and none of it is written down anywhere you can verify.
 
 > **Licensing.** Source-available, not open source. Free for personal use; free for registered small businesses (under US$1M revenue and valuation); everyone else needs a commercial license (see LICENSE; for a commercial license write to jasonblasiak.ai.mail@gmail.com). Patent pending. Draft licence text, not yet reviewed by an attorney.
