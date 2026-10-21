@@ -174,11 +174,11 @@ class ReplayBaseline(Base):
         with self.assertRaises(KeyError):
             cd.replay("t", {}, drifted, verify)
         # the same function with a value that changes between runs is the real drift case
-        counter = {"n": 0}
+        import itertools
+        counter = itertools.count(1)        # not plain data, so identified by type: the identity stays put while the RESULT drifts (captured plain data is part of identity)
 
         def flaky(ctx):
-            counter["n"] += 1
-            return {"answer": 42, "noise": counter["n"]}
+            return {"answer": 42, "noise": next(counter)}
         flaky_steps = [c.Step("compute", flaky)]
         cd2 = self.cond()
         cd2.run("f", {}, flaky_steps, verify)                                   # baseline noise=1

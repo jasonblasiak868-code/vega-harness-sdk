@@ -2,9 +2,10 @@
 
   use_card(repo)                    plain-language card shown BEFORE any copy, splice or combine
   splice_gate(sources, build)       build is 'public' or 'personal'. Public: refuse ANY library source (clean-room only). Personal: allowed only inside
-                                    quarantine, and the output is marked TAINTED with the strictest class touched.
-  release_gate(provenance)          a public release passes only if its provenance STATES an empty library_sources list, has no TAINTED output, and carries a
-                                    clean-room attestation (text or an object; a bare True is not an attestation)
+                                    quarantine, and the output is marked TAINTED with the strictest class touched. A matrix row whose personal_build says no
+                                    (no, never, forbidden, not allowed, refused, false or empty) forbids a personal build with that repo.
+  release_gate(provenance)          a public release passes only if its provenance STATES an empty library_sources list, STATES tainted: false (an absent mark is not
+                                    a clean one), and carries a clean-room attestation (text or an object; a bare True is not an attestation)
 Rules come from a matrix (a list of {repo, license_class, personal_build, public_build, taint_if_used}) given as a path in VEGA_USE_MATRIX or as an argument.
 No matrix, an unknown repo, or an unknown class = treated as NO_LICENSE_FILE (the strict side). Not legal advice."""
 import json
@@ -27,6 +28,23 @@ def load_matrix(path=None):
     if not isinstance(rows, list):
         raise GateRefused("the use matrix is a list of repo rows")
     return {r["repo"]: r for r in rows if isinstance(r, dict) and isinstance(r.get("repo"), str)}
+
+
+_FORBID = ("no", "never", "forbid", "not allowed", "not permitted", "refus", "prohibit", "denied")
+
+
+def personal_forbidden(row):
+    """True if a matrix row says a personal build may not use this repo. Free text is read conservatively: only an explicit no counts, so rows such as 'read in quarantine only'
+    and 'contained use' still allow a personal read inside quarantine."""
+    if not isinstance(row, dict) or "personal_build" not in row:
+        return False
+    v = row["personal_build"]
+    if v is False or v is None:
+        return True
+    if not isinstance(v, str):
+        return False
+    t = v.strip().casefold()
+    return not t or any(t == w or t.startswith(w + " ") or t.startswith(w + ",") or t.startswith(w + ";") or (w.endswith(("bid", "us", "ibit")) and t.startswith(w)) for w in _FORBID)
 
 
 def klass_of(license_class):
@@ -59,6 +77,10 @@ def splice_gate(sources, build, matrix=None):
     if build == "public":
         return {"allowed": False, "tainted": True, "strictest_class": strictest,
                 "reason": "public builds are clean-room only; no library source may be spliced. Write a specification and use the behavioral clean room."}
+    for s_ in sources:
+        row = m.get(s_)
+        if row and personal_forbidden(row):
+            return {"allowed": False, "tainted": True, "strictest_class": strictest, "reason": "the use matrix forbids a personal build with %s" % s_}
     return {"allowed": True, "tainted": True, "strictest_class": strictest, "condition": "inside quarantine only; output marked TAINTED; never part of a public build"}
 
 
@@ -70,8 +92,8 @@ def release_gate(provenance):
         return {"released": False, "reason": "provenance must state library_sources as a list (an absent list is not an empty one)"}
     if srcs:
         return {"released": False, "reason": "provenance lists library sources: %s" % ", ".join(str(s) for s in srcs)}
-    if provenance.get("tainted") is not False and "tainted" in provenance:
-        return {"released": False, "reason": "output is marked TAINTED (or the mark is not a plain false)"}
+    if provenance.get("tainted") is not False:
+        return {"released": False, "reason": "provenance must state tainted: false (it is absent, marked TAINTED, or not a plain false)"}
     att = provenance.get("clean_room_attestation")
     if not ((isinstance(att, str) and att.strip()) or (isinstance(att, dict) and att)):
         return {"released": False, "reason": "no clean-room attestation in the provenance (text or an object; a bare True is not one)"}

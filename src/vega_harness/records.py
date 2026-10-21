@@ -11,6 +11,7 @@ verdicts and counts, never secrets.
 import hashlib
 import json
 import time
+import types
 
 from vega_custody.dag import dag as dagmod
 
@@ -33,6 +34,58 @@ def canon(obj) -> str:
 
 def h(obj) -> str:
     return hashlib.sha256(canon(obj).encode("utf-8")).hexdigest()
+
+
+def _code_digest(code, seen=0):
+    parts = [code.co_code, repr(code.co_names).encode(), repr(code.co_varnames).encode(), repr(code.co_freevars).encode(), repr(code.co_argcount).encode()]
+    for c in code.co_consts:
+        parts.append(_code_digest(c, seen + 1) if isinstance(c, types.CodeType) and seen < 20 else repr(c).encode())
+    return hashlib.sha256(b"\x1e".join(parts)).digest()
+
+
+def _value_id(v, depth):
+    """A stable text for a value a function captured or defaults to: plain JSON data by its canonical form, a function by its own identity, anything else (an object
+    whose state we cannot read safely) by its type alone. Never a memory address."""
+    try:
+        return "j:" + canon(v)
+    except RecordRefused:
+        pass
+    if isinstance(v, float):
+        return "f:" + repr(v)
+    if callable(v) and depth < 3 and (hasattr(v, "__code__") or hasattr(v, "func")):
+        return "fn:" + code_hash(v, depth + 1)
+    return "t:%s.%s" % (type(v).__module__, type(v).__qualname__)
+
+
+def code_hash(fn, depth=0):
+    """Identity of a callable: its compiled instructions, names, nested code, AND the values it captured from its surroundings (closure cells), its default
+    arguments, and (for a partial) the wrapped function and bound arguments. Two functions with the same body but different captured values are different. A captured
+    object that is not plain data is identified by its type only, so a change inside such an object is NOT seen (keep step state in plain data). Bytecode differs
+    between Python versions, so an identity made on one version does not match on another; that fails safe."""
+    code = getattr(fn, "__code__", None)
+    state = None
+    if code is None and hasattr(fn, "func") and hasattr(fn, "args") and hasattr(fn, "keywords"):                      # functools.partial
+        parts = [b"partial", code_hash(fn.func, depth + 1).encode()] + [_value_id(a, depth).encode() for a in fn.args] + \
+                [("%s=%s" % (k, _value_id(v, depth))).encode() for k, v in sorted(fn.keywords.items())]
+        return hashlib.sha256(b"\x1e".join(parts)).hexdigest()
+    if code is None:
+        code = getattr(getattr(fn, "__call__", None), "__code__", None)
+        state = getattr(fn, "__dict__", None)
+    if code is None:
+        return hashlib.sha256(f"{type(fn).__module__}.{type(fn).__qualname__}".encode()).hexdigest()
+    parts = [_code_digest(code)]
+    cells = []
+    for cell in (getattr(fn, "__closure__", None) or ()):
+        try:
+            cells.append(_value_id(cell.cell_contents, depth))
+        except ValueError:                                                                                              # an empty cell
+            cells.append("empty")
+    parts.append(("closure:" + "\x1f".join(cells)).encode())
+    parts.append(("defaults:" + _value_id(list(getattr(fn, "__defaults__", None) or ()), depth)).encode())
+    parts.append(("kwdefaults:" + _value_id(dict(getattr(fn, "__kwdefaults__", None) or {}), depth)).encode())
+    if state is not None:
+        parts.append(("state:" + "\x1f".join("%s=%s" % (k, _value_id(v, depth)) for k, v in sorted(state.items(), key=lambda kv: str(kv[0])))).encode())
+    return hashlib.sha256(b"\x1e".join(parts)).hexdigest()
 
 
 def _view(entry):

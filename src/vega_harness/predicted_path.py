@@ -15,12 +15,15 @@ look at one spec.
 
 Descriptors (exactly one test each): {"equals": v} (type-strict: 1 is not True) {"contains": s} {"in_range": [lo, hi]} (numbers only, not bool) {"is_true": bool}
 (observation must BE that bool) {"type": "dict_has", "keys": [...]} {"custom": "<name in registry['checks']>"}
-Callables live in a registry passed to freeze() and run(), referenced by name. They run in this process with this process's rights."""
+Callables live in a registry passed to freeze() and run(), referenced by name. They run in this process with this process's rights.
+Freezing also records a REGISTRY HASH: every named callable's code identity (records.code_hash, which includes captured values and defaults). run() refuses if the registry
+it is given does not hash the same, so an action, check, response or recovery swapped after freezing cannot run under the frozen spec's signature. A captured object that
+is not plain data is identified by its type only (keep what a callable depends on in plain data)."""
 import hashlib
 import json
 import math
 
-from vega_harness.records import Duplicate, RecordChain, RecordRefused, burn_commitment, canon
+from vega_harness.records import Duplicate, RecordChain, RecordRefused, burn_commitment, canon, code_hash
 
 KNOWN = ("equals", "contains", "in_range", "is_true", "type", "custom")
 
@@ -110,16 +113,33 @@ def validate(spec, registry):
         raise SpecRefused("; ".join(problems))
 
 
+TABLES = ("actions", "checks", "responses", "recoveries")
+
+
+def registry_hash(registry):
+    """Hash of every named callable's code identity in the four registry tables (names and code, not memory addresses)."""
+    out = {}
+    for t in TABLES:
+        tbl = registry.get(t, {}) if isinstance(registry, dict) else {}
+        out[t] = {str(k): (code_hash(v) if callable(v) else "not-callable") for k, v in sorted(tbl.items(), key=lambda kv: str(kv[0]))} if isinstance(tbl, dict) else {}
+    return hashlib.sha256(canon(out).encode("utf-8")).hexdigest()
+
+
 def freeze(spec, registry, log_path):
-    """Validate (fail closed) and record the frozen prediction. Returns the spec hash."""
+    """Validate (fail closed) and record the frozen prediction, bound to this registry's code. Returns the spec hash."""
     validate(spec, registry)
     hh = spec_hash(spec)
-    RecordChain(log_path).append("PATH_FROZEN", {"spec_hash": hh, "goal": str(spec.get("goal", "")), "steps": [s["name"] for s in spec["steps"]]})
+    RecordChain(log_path).append("PATH_FROZEN", {"spec_hash": hh, "registry_hash": registry_hash(registry), "goal": str(spec.get("goal", "")),
+                                                 "steps": [s["name"] for s in spec["steps"]]})
     return hh
 
 
 def _frozen(log, hh):
     return any(r.get("kind") == "PATH_FROZEN" and r.get("spec_hash") == hh for r in log.read())
+
+
+def _frozen_with(log, hh, rh):
+    return any(r.get("kind") == "PATH_FROZEN" and r.get("spec_hash") == hh and r.get("registry_hash") == rh for r in log.read())
 
 
 def _digest(x):
@@ -137,6 +157,8 @@ def run(spec, registry, log_path, state=None, commitment=None, commitment_check=
     if not _frozen(log, hh):
         return {"status": "refused: spec was not frozen first, or changed after freezing", "spec_hash": hh}
     validate(spec, registry)
+    if not _frozen_with(log, hh, registry_hash(registry)):
+        return {"status": "refused: the registry differs from the one frozen with this spec (an action, check, response or recovery changed), or the spec was frozen without a registry binding", "spec_hash": hh}
     purpose = "execute:" + hh
     ok = False
     if commitment_check is not None and commitment is not None:

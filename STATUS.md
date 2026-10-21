@@ -8,7 +8,7 @@
 - reasoning_pipeline
 - records
 
-Tests: 78 tests in 3 files, all passing.
+Tests: 96 tests in 4 files, all passing.
 
 ## DESIGNED ONLY (not built)
 

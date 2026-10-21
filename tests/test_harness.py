@@ -179,7 +179,8 @@ class GateTests(unittest.TestCase):
         self.assertFalse(ug.release_gate({"library_sources": ["a"], "clean_room_attestation": "x"})["released"])
         self.assertFalse(ug.release_gate({"library_sources": [], "tainted": True, "clean_room_attestation": "x"})["released"])
         self.assertFalse(ug.release_gate({"library_sources": []})["released"])
-        self.assertTrue(ug.release_gate({"library_sources": [], "clean_room_attestation": "spec by A, code by B"})["released"])
+        self.assertFalse(ug.release_gate({"library_sources": [], "clean_room_attestation": "spec by A, code by B"})["released"])      # the taint mark must be STATED
+        self.assertTrue(ug.release_gate({"library_sources": [], "tainted": False, "clean_room_attestation": "spec by A, code by B"})["released"])
 
     def test_use_card_names_the_class(self):
         self.assertIn("STRONG_COPYLEFT", ug.use_card("b", self.M))

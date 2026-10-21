@@ -8,6 +8,10 @@ HONEST STATUS: stages whose dependency is not supplied return {"status": "NOT_BU
 the Conductor refuses it without a valid single-use commitment for that step, and running the frozen path needs a SECOND commitment for the exact spec. Autonomy never mints one.
 The blueprint is a plan, not a result.
 
+Stage numbering: there is no stage 8 (retired; renumbering would change every stage's identity and unlock any locked workflow). The request's token_cap caps the
+run (the tighter of it and the Conductor's own cap). The cache prefix is also reported as append-only layers (policy, goal, anchors), each with the hash of the bytes up to
+and including it: the policy layer's hash is identical for every request, so a provider's prompt cache can hit on it.
+
 Every stage is a plain callable injected through `deps`, so each real component plugs in without changing the sequencing, and tests run with stubs. Runtime objects (the frozen
 spec and its registry of callables) are kept OUT of the hashed context: a hash of a callable's repr would contain a memory address and differ on every run.
 The lesson preflight is wired: the risky verbs found in the request are attached to the steps that act on them, so the Conductor consults the lesson ledger before they run."""
@@ -117,7 +121,8 @@ def build_steps(deps, request, sink=None, runtime=None, path_log=None, spec_comm
     def s05_prefix(ctx):
         ids = [a.get("id", a.get("repo", "")) if isinstance(a, dict) else str(a) for a in ctx.get("associated", [])]
         text, hh = stable_prefix(ctx["request"]["goal"], ids)
-        return {"cache_prefix": {"hash": hh, "chars": len(text)}}
+        layers = prompt_layers([("policy", POLICY_PREFIX), ("goal", ctx["request"]["goal"].strip()), ("anchors", ",".join(sorted(set(map(str, ids)))))])["layers"]
+        return {"cache_prefix": {"hash": hh, "chars": len(text), "layers": layers}}
 
     def s06_history(ctx):
         return {"history": d["history"](ctx["request"]["goal"]) if "history" in d else dict(NOT_BUILT)}
@@ -232,5 +237,6 @@ def plan(request, conductor, deps=None, commitment=None, spec_commitment=None, e
     if not execute:
         steps = steps[:-1]
     verify = lambda ctx: bool(ctx.get("blueprint")) and bool(ctx.get("blueprint_hash"))
-    rec = conductor.run("preexec:" + hashlib.sha256(request["goal"].encode()).hexdigest()[:12], {}, steps, verify, commitment=commitment)
+    rec = conductor.run("preexec:" + hashlib.sha256(request["goal"].encode()).hexdigest()[:12], {}, steps, verify, commitment=commitment,
+                        token_cap=request.get("token_cap"))
     return {"run": rec, "blueprint": sink[0] if sink else None, "execution": runtime.get("execution")}

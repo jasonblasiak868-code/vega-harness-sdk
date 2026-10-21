@@ -25,7 +25,7 @@ Everything lands in an append-only, hash-chained record — hashes and verdicts,
 | Deterministic workflow conduct with no model in the loop | `conductor.py` (module contains no model call by design); `tests/test_harness.py::ConductorTests`, `tests/redteam_1_conductor.py` |
 | Human-only gate: single-use commitments, burned so one signature authorises one step once | `conductor.py`, `records.py::burn_commitment`; `redteam_1_conductor.py::HumanGate` |
 | Lesson preflight that fails closed — a failing check stops the run, never skipped silently | `conductor.py::Conductor.run`; `redteam_1_conductor.py::Preflight` |
-| Token cap measured per step (0 is refused, not read as "unlimited") | `conductor.py::est_tokens`; `test_harness.py::test_token_cap_stops_the_run` |
+| Token cap measured per step (0 is refused, not read as "unlimited"; a request's cap caps its run; checked before any commitment is burned) | `conductor.py::est_tokens`; `test_harness.py::test_token_cap_stops_the_run` |
 | Strict verification: only exactly `True` passes; a crashing verifier or second opinion blocks success | `conductor.py`; `redteam_1_conductor.py::LyingVerifiers` |
 | Replay that locks a workflow only if it reproduces the first candidate's result hash | `conductor.py::Conductor.replay`; `redteam_1_conductor.py::ReplayBaseline` |
 | Pre-registered predicted paths: freeze before effect, compare reality, halt + recover on surprise | `predicted_path.py::freeze`, `run`; `test_harness.py::PathTests`, `redteam_2_path_gates_pipeline.py::Commitments` |
@@ -93,7 +93,7 @@ For a full gated run (Conductor, frozen paths, commitments) see the tests — `t
 
 ## Tests
 
-78 tests in 3 files, all passing (counts from STATUS.md and REVIEW.md): `tests/test_harness.py` (functional), `tests/redteam_1_conductor.py` and `tests/redteam_2_path_gates_pipeline.py` (hand-written red-team). Run them with `src` of this repo and of its three dependencies on `PYTHONPATH`:
+96 tests in 4 files, all passing (counts from STATUS.md and REVIEW.md): `tests/test_harness.py` (functional), `tests/redteam_1_conductor.py` and `tests/redteam_2_path_gates_pipeline.py` (hand-written red-team). Run them with `src` of this repo and of its three dependencies on `PYTHONPATH`:
 
 ```
 python tests/test_harness.py

@@ -183,14 +183,14 @@ class Gates(unittest.TestCase):
         self.assertFalse(ug.splice_gate(["perm"], "public", self.M)["allowed"])
 
     def test_release_gate_wants_everything_stated_not_just_nothing_wrong(self):
-        good = {"library_sources": [], "clean_room_attestation": "spec by A, code by B"}
+        good = {"library_sources": [], "tainted": False, "clean_room_attestation": "spec by A, code by B"}
         self.assertTrue(ug.release_gate(good)["released"])
-        for bad in (None, [], "x", {}, {"clean_room_attestation": "x"}, {"library_sources": "none", "clean_room_attestation": "x"}, {"library_sources": None, "clean_room_attestation": "x"},
+        for bad in (None, [], "x", {}, {"library_sources": [], "clean_room_attestation": "spec by A, code by B"}, {"clean_room_attestation": "x"}, {"library_sources": "none", "clean_room_attestation": "x"}, {"library_sources": None, "clean_room_attestation": "x"},
                     {"library_sources": [], "clean_room_attestation": True}, {"library_sources": [], "clean_room_attestation": ""}, {"library_sources": [], "clean_room_attestation": "  "},
                     {"library_sources": [], "clean_room_attestation": {}}, {**good, "tainted": True}, {**good, "tainted": "false"}, {**good, "tainted": None}, {**good, "library_sources": ["x"]}):
             self.assertFalse(ug.release_gate(bad)["released"], repr(bad)[:70])
         self.assertTrue(ug.release_gate({**good, "tainted": False})["released"])
-        self.assertTrue(ug.release_gate({"library_sources": [], "clean_room_attestation": {"spec": "sha", "implementer": "B"}})["released"])
+        self.assertTrue(ug.release_gate({"library_sources": [], "tainted": False, "clean_room_attestation": {"spec": "sha", "implementer": "B"}})["released"])
 
     def test_a_damaged_matrix_file_is_a_clear_error_not_a_permissive_default(self):
         d = tempfile.TemporaryDirectory()
