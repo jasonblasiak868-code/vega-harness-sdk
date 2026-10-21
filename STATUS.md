@@ -7,12 +7,14 @@
 - use_gate
 - reasoning_pipeline
 - records
+- arsenal (index of tools, repos, symbols, prompts, solutions and skills; search by TF-IDF or a supplied embedding; licence class and use card on repo hits; pipeline stage 12)
 
-Tests: 96 tests in 4 files, all passing.
+Tests: 115 tests in 5 files, all passing.
 
 ## DESIGNED ONLY (not built)
 
-- Stages without a supplied dependency report NOT_BUILT (prompt reconstruction, kinetic prediction, history, arsenal, hybrid).
+- Stages without a supplied dependency report NOT_BUILT (prompt reconstruction, kinetic prediction, history, hybrid; the arsenal stage until something has been indexed).
+- The arsenal starts empty; a loader from the repo library, scoring from recorded outcomes, and the self-improvement loop are not built. Matching on meaning needs a supplied embedding function.
 
 ## Release
 

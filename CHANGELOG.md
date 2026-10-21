@@ -15,6 +15,9 @@ These were found by reading the source against its own documentation after relea
 - **The library gate never read the matrix row's `personal_build` field.** A row that says no (no, never, forbidden, not allowed, refused, false or empty) now forbids a personal build with that repo; rows such as "read in quarantine only" still allow a quarantined read.
 - Stage numbering skips 8: documented as retired (renumbering would change every stage's identity).
 
+### Added
+- **The arsenal** (`vega_harness.arsenal`): a hashed index of tools, repos, functions, prompts, solutions and skills with scores, licence class and use cards, wired to pipeline stage 12. Starts empty. See the README section "The arsenal and the repo library".
+
 ### Changed (read before upgrading)
 - `release_gate` callers must include `"tainted": false`.
 - A spec frozen by an earlier version has no registry binding and must be frozen again before it can run.

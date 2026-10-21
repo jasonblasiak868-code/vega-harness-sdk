@@ -6,7 +6,7 @@ Spec v1.0 — 2026-10-19 — describes the published reference implementation as
 
 This specification covers the five modules published in `src/vega_harness/`: `conductor`, `predicted_path`, `use_gate`, `reasoning_pipeline` and `records`. It specifies what each module guarantees, what it refuses, and how a third party can verify both by running the tests in `tests/`.
 
-Out of scope: the behavior of the dependencies themselves (vega-custody-sdk, vega-governance-jacket-sdk, vega-librarian-sdk — each has its own spec), the pipeline stages that report `NOT_BUILT` when their dependency is not supplied (prompt reconstruction, kinetic prediction, history, arsenal, hybrid — DESIGNED ONLY per STATUS.md), any operating-system-level containment, and any legal interpretation of the license matrix.
+Out of scope: the behavior of the dependencies themselves (vega-custody-sdk, vega-governance-jacket-sdk, vega-librarian-sdk — each has its own spec), the pipeline stages that report `NOT_BUILT` when their dependency is not supplied (prompt reconstruction, kinetic prediction, history, hybrid — DESIGNED ONLY per STATUS.md; the arsenal stage reports NOT_BUILT until something is indexed), any operating-system-level containment, and any legal interpretation of the license matrix.
 
 ## 2. Vocabulary
 
@@ -95,6 +95,16 @@ Definitions simplified from the code's own docstrings.
 
 **Invariants.** No stage is skipped silently; unbuilt is stated, never hidden. Verification status `NOT_BUILT` means nothing was verified — the challenge note says so explicitly ("do not trust a pick"). The blueprint is a plan, not a result. Autonomy never mints a commitment.
 
+### 3.6 arsenal.py — the war chest index
+
+**Role.** One index of everything the harness can reach for, so a model asks instead of remembering. Entry kinds: tool, repo, symbol, prompt, solution, skill. Each entry has a name, a summary, a path, tags, a score from 0 to 1 and an optional licence class.
+
+**Public interface.** `Arsenal(path=None, embed=None, use_matrix=None)` with `add`, `remove`, `save`, `search(query, n, kind, show_use_cards)`, `manifest(per_kind)`, `index_hash()` and `as_dependency(n, kind, threshold, show_use_cards)` (the callable pipeline stage 12 takes); `KINDS`, `ArsenalError`.
+
+**Behavior.** Entries are checked on the way in (kind, non-empty text, score a real number from 0 to 1, tags a list) and stored whole, never truncated. Searching ranks by similarity, then by the stored score, then by name; a hit for a repo carries its licence class (a missing class is the strict side) and, on request, the use card. The manifest and the index hash do not depend on insertion order. An empty arsenal reports `NOT_BUILT` to the pipeline.
+
+**Not guaranteed.** A close match is a candidate, not an answer. The score is what the caller entered. Default matching is on words, not meaning.
+
 ## 4. Guarantees and non-guarantees
 
 ### Guarantees (module — test that demonstrates)
@@ -167,7 +177,7 @@ Dependencies point down layers only, never up or sideways: custody (0), jacket (
 
 ## 7. Conformance
 
-A third party verifies this spec by running the tests: put `src` of this repo and of vega-custody-sdk, vega-governance-jacket-sdk and vega-librarian-sdk on `PYTHONPATH`, then run each file in `tests/` (`test_harness.py`, `redteam_1_conductor.py`, `redteam_2_path_gates_pipeline.py`). STATUS.md and REVIEW.md record 96 tests in 4 files, all passing.
+A third party verifies this spec by running the tests: put `src` of this repo and of vega-custody-sdk, vega-governance-jacket-sdk and vega-librarian-sdk on `PYTHONPATH`, then run each file in `tests/` (`test_harness.py`, `redteam_1_conductor.py`, `redteam_2_path_gates_pipeline.py`). STATUS.md and REVIEW.md record 115 tests in 5 files, all passing.
 
 **What passing means:** the published reference implementation behaves as specified here — gates refuse what they must, records chain and verify, failures are recorded rather than raised past the caller.
 

@@ -18,6 +18,19 @@ This kit replaces the promises with machinery. The **Conductor** is a determinis
 
 Everything lands in an append-only, hash-chained record — hashes and verdicts, never secrets — so a third party can check what happened without trusting the model, the operator, or this project.
 
+## The arsenal and the repo library
+
+**Why.** A model carries a great deal inside itself: prompts, loops, tools, hooks, workflows, pipelines, engineering practice, memory, and copies of other people's source code. All of that weighs on the model, and the model still does not reliably *know* what it has, because its training overlooks its own capabilities. This kit takes those things out of the model and keeps them outside, in an indexed **war chest** (the arsenal), so the model does not have to remember what it can do: it asks.
+
+**The arsenal.** Every capability is an entry: a tool, a skill, a prompt, a loop, a pipeline, a whole repo, a single function, a past solution. Each entry has a plain summary and a score, and sits in one index. When a situation arrives, the harness searches the index ("I need something that does this") and returns the closest entries with their score, their licence class and, for a repo, the use card that says what may be done with it. The index is hashed, so a run can say which version of the war chest answered. The Conductor and the pipeline use it at stage 12.
+
+**The repo library.** Third-party GitHub repos are ingested (that is `vega-dkg-lattice-sdk`): each archive is vetted, turned into a code graph, and scored per repo and per function, with a licence class from the use matrix. When a build needs something, pieces can be picked from several repos and combined into a runtime card as a *hypothesis* that still needs a contained run. The source itself never enters a build: a public build is clean-room only (a specification in your own words, written by someone who never opened the source); a personal build runs the code inside a sandbox behind a PRE card, only its outputs come back, and anything derived from library code is marked TAINTED, which the release gate refuses.
+
+**What is built and what is not.**
+- BUILT here: the arsenal index (`vega_harness.arsenal`), wired to pipeline stage 12; the use card, splice gate and release gate (`use_gate`).
+- BUILT in sibling kits: repo ingestion, code graph, per-function scores and the combination finder (`vega-dkg-lattice-sdk`); the PRE card and the quarantine (`vega-pareah-sdk`); the proven-record score, the Wilson lower bound and the drift alarm that decide when an apprentice is trusted (`vega-reasoning-sdk`).
+- Honest limits: the arsenal starts **empty** and you load it; there is no loader from the repo library yet. A score is whatever the loader entered; the arsenal does not compute it. The default search matches words (TF-IDF); matching on meaning needs an embedding function you supply. Containment of a sandboxed run is process-level here, not an operating-system sandbox. The loop that feeds recorded outcomes back into the scores (so the war chest improves itself) is DESIGNED, not wired: its parts exist in the reasoning and train kits but nothing connects them to the arsenal yet.
+
 ## Capabilities
 
 | Capability | How you can check it |
@@ -88,12 +101,12 @@ For a full gated run (Conductor, frozen paths, commitments) see the tests — `t
 - **Containment is process-level, not an OS sandbox.** Registry callables, workflow steps and recovery functions run in this process with this process's rights.
 - **The license matrix is policy, not legal advice.** Unknown repos and unknown classes are treated as the strict side; that is a default, not a legal opinion.
 - **The Conductor sequences and gates; it does not reason.** Reasoning lives in the steps and dependencies the caller supplies.
-- **Pipeline stages without a supplied dependency report NOT_BUILT** (prompt reconstruction, kinetic prediction, history, arsenal, hybrid). Nothing pretends to be built that is not — see STATUS.md.
+- **Pipeline stages without a supplied dependency report NOT_BUILT** (prompt reconstruction, kinetic prediction, history, hybrid; and the arsenal stage until something has been indexed). Nothing pretends to be built that is not — see STATUS.md.
 - **Calibration counts whatever was frozen and run.** Easy specs raise the number; it measures prediction accuracy, not plan quality.
 
 ## Tests
 
-96 tests in 4 files, all passing (counts from STATUS.md and REVIEW.md): `tests/test_harness.py` (functional), `tests/redteam_1_conductor.py` and `tests/redteam_2_path_gates_pipeline.py` (hand-written red-team). Run them with `src` of this repo and of its three dependencies on `PYTHONPATH`:
+115 tests in 5 files, all passing (counts from STATUS.md and REVIEW.md): `tests/test_harness.py` (functional), `tests/redteam_1_conductor.py` and `tests/redteam_2_path_gates_pipeline.py` (hand-written red-team). Run them with `src` of this repo and of its three dependencies on `PYTHONPATH`:
 
 ```
 python tests/test_harness.py

@@ -2,7 +2,7 @@
 
 A minute inventory of what this kit actually does, why a prompt-and-policy harness structurally cannot do it, where each rule is enforced in the published code, which test demonstrates it, and — because honesty matters more than a good pitch — the limit of each claim.
 
-Everything below traces to `src/vega_harness/` and `tests/`. Test counts come from STATUS.md and REVIEW.md: 96 tests in 4 files, all passing. Where a capability depends on an injected dependency that this repo does not ship, that is stated, not hidden.
+Everything below traces to `src/vega_harness/` and `tests/`. Test counts come from STATUS.md and REVIEW.md: 115 tests in 5 files, all passing. Where a capability depends on an injected dependency that this repo does not ship, that is stated, not hidden.
 
 **Why "structurally cannot" is a fair phrase.** A prompt-policy harness asks the model to obey rules and, at best, asks the same model to check itself. The thing being checked is the thing doing the checking: if it is wrong, or manipulated, the check is wrong too, and nothing outside the model has to agree. Every capability below moves one of three things outside the model — the authority (a human-signed commitment), the expectation (a hash frozen before any effect), or the memory (an append-only chain the model cannot rewrite). A rule held outside the model cannot be talked out of, and that is an architectural property, not a tuning result.
 
@@ -60,6 +60,12 @@ Stated plainly, as the source states it: **the license matrix is policy, not leg
 | R7 | **Containment decision from evidence**: risky verbs OR any non-permissive license class among candidates → PRE/PEAK plan ("eval sandbox PRE, disposable, no network; behavior probe PEAK after success") | A policy harness decides "is this risky?" by asking the model about its own plan; here the inputs are the detected verbs and the matrix classes — data, not opinion | `s11_containment`: `need = bool(verbs) or any(class != "PERMISSIVE")` | `test_harness.py::test_risky_verbs_and_non_permissive_sources_demand_pre_peak` | The stage outputs a PLAN with named stations; the actual sandbox/probe execution belongs to the containment layers of the family, not to this module |
 | R8 | **Runtime objects kept out of the hashed context**: the frozen spec and its registry of callables live in a side channel, because a hash of a callable's repr would contain a memory address and differ on every run | A naive harness either hashes unstable reprs (producing garbage identity) or excludes them silently; here the exclusion is explicit and the reason is documented in the code | `build_steps(..., runtime=None)`: s16b stores `runtime["spec"]`, `runtime["registry"]`; s18 reads them; the ctx stays plain JSON | `redteam_2::test_the_frozen_spec_and_its_callables_stay_out_of_the_hashed_context` | The spec's INTEGRITY is still covered — by its frozen hash in the ledger, not by the run record |
 | R9 | **Strict request validation**: no text goal, non-text prompt/required_response, or a token_cap that is not a positive whole number → refusal before any stage runs | Lenient input parsing is where a policy harness starts improvising; here malformed intent never reaches the pipeline | `validate_request()` raising `RequestRefused` | `redteam_2::test_bad_requests_are_refused`, `test_a_dependency_that_returns_non_json_fails_the_run_closed` | Validation covers shape, not sense: a well-formed goal can still be a bad goal |
+
+## 4b. Arsenal — the war chest index (`arsenal.py`)
+
+| # | Capability | Why a prompt-policy harness structurally cannot offer it | Where enforced in code | Test | Honest limit |
+|---|---|---|---|---|---|
+| A1 | **One searchable index of every capability** (tool, repo, function, prompt, past solution, skill), each with a summary and a score, returned with licence class and use card | A model's own sense of what it can do comes from training and misses things; an index answers "what do I have for this" from a record | `Arsenal.add` / `search` / `manifest` / `index_hash`; `as_dependency` feeds pipeline stage 12 | `tests/test_arsenal.py` (19 tests, six rule breakages each caught) | Starts empty; scores are supplied; word matching unless an embedding is supplied; a hit is a candidate, not an answer |
 
 ## 5. Records — the shared spine (`records.py`)
 
