@@ -10,6 +10,7 @@ Rules come from a matrix (a list of {repo, license_class, personal_build, public
 No matrix, an unknown repo, or an unknown class = treated as NO_LICENSE_FILE (the strict side). Not legal advice."""
 import json
 import os
+import re
 
 STRICT = ["NON_COMMERCIAL_OR_RESTRICTED", "STRONG_COPYLEFT", "WEAK_COPYLEFT", "NO_LICENSE_FILE", "UNKNOWN", "PERMISSIVE"]   # strictest first
 DEFAULT_CLASS = "NO_LICENSE_FILE"
@@ -30,7 +31,7 @@ def load_matrix(path=None):
     return {r["repo"]: r for r in rows if isinstance(r, dict) and isinstance(r.get("repo"), str)}
 
 
-_FORBID = ("no", "never", "forbid", "not allowed", "not permitted", "refus", "prohibit", "denied")
+_FORBID_RX = re.compile(r"(?:no|never|not allowed|not permitted|forbid\w*|refus\w*|prohibit\w*|denied)(?![a-z])")     # an explicit no at the start, however it is punctuated ("no.", "no: x", "No - read only")
 
 
 def personal_forbidden(row):
@@ -44,7 +45,7 @@ def personal_forbidden(row):
     if not isinstance(v, str):
         return False
     t = v.strip().casefold()
-    return not t or any(t == w or t.startswith(w + " ") or t.startswith(w + ",") or t.startswith(w + ";") or (w.endswith(("bid", "us", "ibit")) and t.startswith(w)) for w in _FORBID)
+    return not t or _FORBID_RX.match(t) is not None
 
 
 def klass_of(license_class):

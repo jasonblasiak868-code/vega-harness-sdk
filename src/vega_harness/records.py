@@ -36,10 +36,25 @@ def h(obj) -> str:
     return hashlib.sha256(canon(obj).encode("utf-8")).hexdigest()
 
 
+def _has_set(c):
+    return isinstance(c, (frozenset, set)) or (isinstance(c, tuple) and any(_has_set(x) for x in c))
+
+
+def _const_repr(c, seen):
+    """A repr of a code constant that does not depend on the process: a frozenset (from `x in {"a", "b"}`) is sorted, because its own repr follows string-hash randomisation and would give the same step a different identity in every process."""
+    if isinstance(c, types.CodeType) and seen < 20:
+        return _code_digest(c, seen + 1)
+    if isinstance(c, (frozenset, set)):
+        return b"set(" + b",".join(sorted(_const_repr(x, seen) for x in c)) + b")"
+    if isinstance(c, tuple) and _has_set(c):
+        return b"tuple(" + b",".join(_const_repr(x, seen) for x in c) + b")"
+    return repr(c).encode()                               # everything else keeps its plain repr, so the identity of a function with no set literal is unchanged
+
+
 def _code_digest(code, seen=0):
     parts = [code.co_code, repr(code.co_names).encode(), repr(code.co_varnames).encode(), repr(code.co_freevars).encode(), repr(code.co_argcount).encode()]
     for c in code.co_consts:
-        parts.append(_code_digest(c, seen + 1) if isinstance(c, types.CodeType) and seen < 20 else repr(c).encode())
+        parts.append(_const_repr(c, seen))
     return hashlib.sha256(b"\x1e".join(parts)).digest()
 
 

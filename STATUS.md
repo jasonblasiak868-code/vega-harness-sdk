@@ -9,7 +9,7 @@
 - records
 - arsenal (index of tools, repos, symbols, prompts, solutions and skills; search by TF-IDF or a supplied embedding; licence class and use card on repo hits; pipeline stage 12)
 
-Tests: 115 tests in 5 files, all passing.
+Tests: 118 tests in 6 files, all passing.
 
 ## DESIGNED ONLY (not built)
 
