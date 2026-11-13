@@ -1,0 +1,21 @@
+{
+ "pack": "PACK-HARNESS",
+ "repo": "vega-harness-sdk",
+ "members": [
+  "vega-harness-sdk",
+  "vega-custody-sdk",
+  "vega-governance-jacket-sdk",
+  "vega-phone-harness-sdk",
+  "vega-arsenal-sdk",
+  "vega-repo-forge-sdk",
+  "vega-code-graph-sdk"
+ ],
+ "requires": [
+  "PACK-DKG-LATTICE",
+  "PACK-PROOF-NEED",
+  "PACK-GOVERNANCE-SPINE"
+ ],
+ "dkg_anchor": "DKG-REPO-PACKS-20261113",
+ "version": "v0.1",
+ "disclosed": "2026-11-13"
+}
